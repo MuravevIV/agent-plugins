@@ -166,6 +166,13 @@ def by_name_problems(skill_dir, rel):
 
 # ---- check ----
 
+def kept_elsewhere(entry):
+    """True for a marketplace entry that points at a plugin kept somewhere else: an npm package, another
+    repository. Its source is a table whose kind is not "local". Such a plugin has no folder here."""
+    src = entry.get("source") if isinstance(entry, dict) else None
+    return isinstance(src, dict) and src.get("source") not in (None, "local")
+
+
 def check_repo(repo, only=None, fix=False):
     """Check (and with fix, put right) the plugin files. Returns (problems left, things put right, skill lines)."""
     left, fixed, skills = [], [], []
@@ -257,7 +264,12 @@ def check_repo(repo, only=None, fix=False):
     for relpath, data in [] if only else markets.items():
         for e in data["plugins"]:
             n = e.get("name") if isinstance(e, dict) else None
-            if n not in names:
+            if n not in names and kept_elsewhere(e):
+                # a pointer: the plugin's files live at its source, and nothing of it is checked here
+                src = e["source"]
+                where = " ".join(str(src[k]) for k in ("package", "repo", "url", "path") if src.get(k))
+                skills.append(f"  {n}: kept elsewhere ({src['source']} {where}); only listed in {relpath.as_posix()}")
+            elif n not in names:
                 found(f"{relpath.as_posix()} lists a plugin {show(n)} that has no folder in plugins/",
                       "remove that entry by hand, or create the plugin with new-plugin")
     for relpath in dirty:
@@ -556,8 +568,18 @@ def codex_line(text, key):
 
 
 def cmd_enable(repo, args):
-    need_plugin(repo, args.plugin, "there is nothing to switch on. Give the name of one of those plugins. "
-                                   "Nothing was changed.")
+    listed, _why = load_json(repo / CLAUDE_MARKET)
+    pointer = any(isinstance(e, dict) and e.get("name") == args.plugin and kept_elsewhere(e)
+                  for e in (listed or {}).get("plugins") or [])
+    if pointer:
+        # kept at its own source and listed for Claude Code only; the other apps' files do not know it
+        if [a for a in APPS if a in args.apps and a != "claude"]:
+            print(f"Note: {args.plugin} is kept elsewhere and only listed for Claude Code, so it is switched on "
+                  "for Claude Code only.")
+        args.apps = ["claude"]
+    else:
+        need_plugin(repo, args.plugin, "there is nothing to switch on. Give the name of one of those plugins. "
+                                       "Nothing was changed.")
     project = Path(args.project).resolve()
     if not project.is_dir():
         raise Stop(2, f"The project folder {project} does not exist, so there is nowhere to switch the plugin on. "

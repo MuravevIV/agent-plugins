@@ -154,6 +154,36 @@ class PackSkillTest(unittest.TestCase):
         self.assertIn("core / new-skill: keep", out)
         self.assertNotIn("Problem:", out)
 
+    def test_check_accepts_an_entry_that_points_at_a_plugin_kept_elsewhere(self):
+        market = self.load(".claude-plugin/marketplace.json")
+        market["plugins"].append({"name": "outside", "description": "Somebody else's plugin",
+                                  "source": {"source": "npm", "package": "outside-agents"}})
+        write(self.repo / ".claude-plugin" / "marketplace.json", json.dumps(market, indent=2) + "\n")
+        code, out = self.run_main("check")
+        self.assertEqual(code, 0, out)
+        self.assertIn("outside: kept elsewhere (npm outside-agents)", out)
+        self.assertNotIn("Problem:", out)
+        code, out = self.run_main("check", "--fix")
+        self.assertEqual(code, 0, out)
+        self.assertEqual([p["name"] for p in self.load(".agents/plugins/marketplace.json")["plugins"]], ["core"],
+                         "a pointer is not copied into the other marketplace file")
+
+        project = self.root / "some-project"
+        project.mkdir()
+        code, out = self.run_main("enable", "outside", "--project", str(project))
+        self.assertEqual(code, 0, out)
+        self.assertIn("switched on for Claude Code only", out)
+        settings = json.loads((project / ".claude" / "settings.json").read_text(encoding="utf-8"))
+        self.assertIs(settings["enabledPlugins"]["outside@agent-plugins"], True)
+        self.assertFalse((project / ".codex").exists())
+        self.assertFalse((project / ".github").exists())
+
+        market["plugins"].append({"name": "ghost", "source": "./plugins/ghost", "description": "No folder"})
+        write(self.repo / ".claude-plugin" / "marketplace.json", json.dumps(market, indent=2) + "\n")
+        code, out = self.run_main("check")
+        self.assertNotEqual(code, 0, out)
+        self.assertIn('lists a plugin "ghost" that has no folder', out)
+
     def test_add_points_out_paths_and_the_home_project_in_the_text(self):
         src = self.root / "home-proj" / ".claude" / "skills" / "new-skill"
         write(src / "SKILL.md", "---\nname: new-skill\ndescription: A skill made for tests.\n---\n\n"
