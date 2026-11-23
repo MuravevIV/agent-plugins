@@ -50,14 +50,14 @@ applies.
 In Claude Code:
 
 ```
-/plugin marketplace add <owner>/<repo>
+/plugin marketplace add MuravevIV/agent-plugins
 /plugin install core@agent-plugins
 /plugin install protocol@agent-plugins
 /plugin install tool@agent-plugins
 ```
 
-Replace `<owner>/<repo>` with this repository's address on GitHub, or
-give the path of a local clone. `plane-mcp` is installed only where MCP
+The path of a local clone works in place of the address. `plane-mcp` is
+installed only where MCP
 servers are allowed, and needs `PLANE_API_KEY`, `PLANE_WORKSPACE_SLUG`,
 `PLANE_BASE_URL` and `PLANE_API_HOST_URL` set in the environment.
 
