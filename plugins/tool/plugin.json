@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "tool",
+  "version": "0.1.0",
+  "description": "Tool skills: how to reach the systems the user works with, each with a script that needs no MCP server",
+  "author": {
+    "name": "Ilya Muravyev"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "agent-plugins",
+  "owner": {
+    "name": "Ilya Muravyev"
+  },
+  "metadata": {
+    "description": "Skills packed as plugins for Claude Code, Codex and Copilot"
+  },
+  "plugins": [
+    {
+      "name": "core",
+      "source": "./plugins/core",
+      "description": "Skills for making, testing and filing skills"
+    },
+    {
+      "name": "protocol",
+      "source": "./plugins/protocol",
+      "description": "Working protocols the user picks for a session by typing the skill's name"
+    },
+    {
+      "name": "tool",
+      "source": "./plugins/tool",
+      "description": "Tool skills: how to reach the systems the user works with, each with a script that needs no MCP server"
+    },
+    {
+      "name": "plane-mcp",
+      "source": "./plugins/plane-mcp",
+      "description": "The Plane MCP server, for places where MCP servers are allowed. The tool:plane skill works without it"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "skill_name": "bookstack",
+  "note": "All three cases are made up. Each run gets its own shelf in the user's local BookStack (setup_case.py) and a small git repository with two docs. What happened is read back from the wiki and from the run's folder by check_runs.py; no model grades. The comparison is with the loose skill this one was made from, whose sync script is PowerShell.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "First mirror of new docs",
+      "prompt": "I wrote the first docs for this project under docs/. Put them on the wiki.",
+      "expected_output": "The shelf exists with the books Notes and Plans and one page in each. The mapping file holds both pages. The link from the overview to the roadmap is a wiki permalink with its anchor.",
+      "files_root": "evals/files/repo",
+      "files": ["evals/files/repo/README.md", "evals/files/repo/docs/overview.md", "evals/files/repo/docs/plans/roadmap.md", "evals/files/repo/docs/.wiki-sync.json"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "The shelf exists and has exactly two pages",
+        "The pages sit in books named Notes and Plans",
+        "The mapping file holds the ids of both pages",
+        "The overview page links to the roadmap page by permalink and keeps the anchor",
+        "The outside link in the overview page is unchanged",
+        "No page starts with its own title as a heading"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Edit a doc and update the wiki",
+      "prompt": "Add the line \"- Count by word\" under Next in docs/plans/roadmap.md and update the wiki.",
+      "expected_output": "The roadmap page on the wiki has the new line. There are still exactly two pages, with the same ids as before.",
+      "files_root": "evals/files/repo",
+      "files": ["evals/files/repo/README.md", "evals/files/repo/docs/overview.md", "evals/files/repo/docs/plans/roadmap.md", "evals/files/repo/docs/.wiki-sync.json"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "The roadmap page on the wiki contains Count by word",
+        "The shelf still has exactly two pages",
+        "Both pages have the ids they had before"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Rename a doc and keep its page",
+      "prompt": "Rename docs/plans/roadmap.md to docs/plans/plan-2027.md. Its wiki page must stay the same page, and nothing on the wiki may be duplicated.",
+      "expected_output": "The file is renamed, the mapping entry moved to the new path with the old page id, the shelf still has exactly two pages, and the overview still links to that page.",
+      "files_root": "evals/files/repo",
+      "files": ["evals/files/repo/README.md", "evals/files/repo/docs/overview.md", "evals/files/repo/docs/plans/roadmap.md", "evals/files/repo/docs/.wiki-sync.json"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "docs/plans/plan-2027.md exists and docs/plans/roadmap.md does not",
+        "The mapping file gives the new path the page id the old path had",
+        "The shelf still has exactly two pages",
+        "The overview page still links to that page by permalink"
+      ]
+    }
+  ]
+}

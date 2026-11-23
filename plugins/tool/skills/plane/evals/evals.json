@@ -1,0 +1,50 @@
+{
+  "skill_name": "plane",
+  "note": "All three cases are made up. Each run gets its own throwaway project in the user's local Plane (setup_case.py). What happened is read back from Plane and from the answer by check_runs.py; no model grades. The comparison is with the loose skill this one was made from, which reaches Plane by hand-written calls.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "List open tickets",
+      "prompt": "Which tickets of this repository's Plane project are still open? Give me the key, the title and the state of each.",
+      "expected_output": "The eight open tickets (numbers 1, 2, 3, 5, 6, 7, 8, 9) with their states. The completed ticket 4 and the cancelled ticket 10 are not listed as open. Nothing is changed.",
+      "files_root": "evals/files",
+      "files": ["evals/files/README.md"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "The answer names all eight open tickets",
+        "The answer does not list ticket 4 or ticket 10 as open",
+        "No ticket was created or changed"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Create a ticket under an epic",
+      "prompt": "In this repository's Plane project, create a ticket \"Count words in a file\" under the epic Counting, put it in progress, and add the comment \"Started.\" to it.",
+      "expected_output": "One new ticket with that name, its parent is Epic: Counting, its state group is started, and it has one comment.",
+      "files_root": "evals/files",
+      "files": ["evals/files/README.md"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "Exactly one new ticket exists and its name is Count words in a file",
+        "The new ticket's parent is the ticket named Epic: Counting",
+        "The new ticket is in a started state",
+        "The new ticket has exactly one comment",
+        "No starting ticket was changed"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Close a ticket and say its parent",
+      "prompt": "Mark ticket 5 of this repository's Plane project as done, and tell me which ticket is its parent.",
+      "expected_output": "Ticket 5 is in a completed state, nothing else changed, and the answer names ticket 1, Epic: Counting, as the parent.",
+      "files_root": "evals/files",
+      "files": ["evals/files/README.md"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "Ticket 5 is in a completed state",
+        "No other ticket was changed and no ticket was created",
+        "The answer names ticket 1 or Epic: Counting as the parent"
+      ]
+    }
+  ]
+}

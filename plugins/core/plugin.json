@@ -1,0 +1,7 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "core",
+  "version": "0.1.0",
+  "description": "Skills for making, testing and filing skills",
+  "author": { "name": "Ilya Muravyev" }
+}

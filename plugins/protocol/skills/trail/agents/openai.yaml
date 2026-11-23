@@ -1,0 +1,5 @@
+# Codex reads this file. It keeps Codex from opening the skill on its own;
+# the user loads it by picking protocol:trail. Claude Code and Copilot get the same
+# from "disable-model-invocation: true" in SKILL.md.
+policy:
+  allow_implicit_invocation: false

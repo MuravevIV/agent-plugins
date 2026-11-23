@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "plane-mcp",
+  "version": "0.1.0",
+  "description": "The Plane MCP server, for places where MCP servers are allowed. The tool:plane skill works without it",
+  "author": {
+    "name": "Ilya Muravyev"
+  }
+}

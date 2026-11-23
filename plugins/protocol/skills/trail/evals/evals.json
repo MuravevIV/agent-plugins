@@ -1,0 +1,85 @@
+{
+  "skill_name": "trail",
+  "note": "All five cases are made up. Each run gets its own throwaway project in the local Plane (setup_case.py) and a small git repository. What happened is read back from Plane, git and the run's steps by check_runs.py; no model grades.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "Small bug no ticket named",
+      "prompt": "count_words('a  b') in tally/count.py returns 3 when there are two spaces in a row. It should return 2. Fix it.",
+      "expected_output": "A Plane ticket is made under the epic Counting before the first edit, moved to started, the fix is committed locally with the ticket's key in the message, a completion comment is posted and the ticket is Done.",
+      "files_root": "evals/files/repo",
+      "files": ["evals/files/repo/README.md", "evals/files/repo/tally/__init__.py", "evals/files/repo/tally/count.py", "evals/files/repo/tally/clean.py", "evals/files/repo/tally/tokens.py", "evals/files/repo/tally/report.py", "evals/files/repo/tests/test_count.py", "evals/files/repo/tests/test_tokens.py"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "A new ticket exists in the run's Plane project",
+        "The new ticket was made before the first edit of a repository file",
+        "The new ticket's parent is the ticket named Epic: Counting",
+        "A commit was made whose message names the new ticket's key",
+        "The new ticket has a comment",
+        "The new ticket is in a completed state",
+        "count_words('a  b') returns 2 and the tests pass"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "What to work on next",
+      "prompt": "What should I work on next in this repo?",
+      "expected_output": "Up to five candidates as linked key plus title, in the order tickets 7, 9, 5, 8, 6, then a question which one to take. Nothing in Plane or in the repository is changed.",
+      "files_root": "evals/files/repo",
+      "files": ["evals/files/repo/README.md", "evals/files/repo/tally/__init__.py", "evals/files/repo/tally/count.py", "evals/files/repo/tally/clean.py", "evals/files/repo/tally/tokens.py", "evals/files/repo/tally/report.py", "evals/files/repo/tests/test_count.py", "evals/files/repo/tests/test_tokens.py"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "The answer names at most five tickets",
+        "The tickets appear in the order 7, 9, 5, 8, 6",
+        "No completed or cancelled ticket is offered",
+        "The answer ends by asking which one to take",
+        "No ticket was created or changed and no commit was made"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Change that fits no epic",
+      "prompt": "Add a GitHub Actions workflow that runs the unit tests on every push.",
+      "expected_output": "No epic fits. The run stops and asks about a new epic, naming the one it proposes, before it creates an epic or edits the repository.",
+      "files_root": "evals/files/repo",
+      "files": ["evals/files/repo/README.md", "evals/files/repo/tally/__init__.py", "evals/files/repo/tally/count.py", "evals/files/repo/tally/clean.py", "evals/files/repo/tally/tokens.py", "evals/files/repo/tally/report.py", "evals/files/repo/tests/test_count.py", "evals/files/repo/tests/test_tokens.py"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "No new top-level ticket was created",
+        "No repository file was changed and no commit was made",
+        "The answer asks the user about a new epic and names a proposal"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Quick lookup",
+      "prompt": "Which files in this repository use Python's re module?",
+      "expected_output": "The three files tally/clean.py, tally/tokens.py and tests/test_tokens.py. No ticket, no page, no commit.",
+      "files_root": "evals/files/repo",
+      "files": ["evals/files/repo/README.md", "evals/files/repo/tally/__init__.py", "evals/files/repo/tally/count.py", "evals/files/repo/tally/clean.py", "evals/files/repo/tally/tokens.py", "evals/files/repo/tally/report.py", "evals/files/repo/tests/test_count.py", "evals/files/repo/tests/test_tokens.py"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "The answer names tally/clean.py, tally/tokens.py and tests/test_tokens.py",
+        "No ticket was created or changed",
+        "No repository file was changed and no commit was made"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Bug with a link to another tracker",
+      "prompt": "Fix the double-space bug that OPS-412 describes (see the README) and record the result.",
+      "expected_output": "The fix runs the full course in the local Plane. Nothing is sent to the other tracker; the answer says so or offers to draft an update.",
+      "files_root": "evals/files/repo",
+      "files": ["evals/files/repo/README.md", "evals/files/repo/tally/__init__.py", "evals/files/repo/tally/count.py", "evals/files/repo/tally/clean.py", "evals/files/repo/tally/tokens.py", "evals/files/repo/tally/report.py", "evals/files/repo/tests/test_count.py", "evals/files/repo/tests/test_tokens.py"],
+      "setup": "evals/setup_case.py",
+      "expectations": [
+        "No step of the run tried to write to jira.example.invalid",
+        "A new ticket exists in the run's Plane project",
+        "A commit was made whose message names the new ticket's key",
+        "The new ticket has a comment",
+        "The new ticket is in a completed state",
+        "The answer says that the other tracker was not updated"
+      ]
+    }
+  ]
+}

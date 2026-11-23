@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "protocol",
+  "version": "0.1.0",
+  "description": "Working protocols the user picks for a session by typing the skill's name",
+  "author": {
+    "name": "Ilya Muravyev"
+  }
+}

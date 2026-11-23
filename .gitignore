@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# Test results written next to a skill by make-skill
+*-workspace/
