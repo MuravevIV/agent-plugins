@@ -11,7 +11,7 @@ applies until the session ends. You are the manager.
 
 | Role | Model | Does |
 |---|---|---|
-| Manager | `anthropic/claude-fable-5-2`, the main session | Thinks, talks with the user, decides what to hand off, writes the briefs, checks what comes back |
+| Manager | The main session, on whatever model the user chose for it | Thinks, talks with the user, decides what to hand off, writes the briefs, checks what comes back |
 | Executors | `anthropic/claude-opus-5-5`, `anthropic/claude-sonnet-5-5`, `anthropic/claude-haiku-5-5` | Well-defined work from a written brief |
 | Grader | `openai/gpt-6.2-sol` | Grades answers when a score is the result |
 
@@ -43,8 +43,12 @@ pick the nearest equivalent and tell the user which one you picked.
 ## Which model gets the work
 
 - Name the model on every handoff. A subagent with no model named runs
-  on your model, the most expensive one.
-- Never hand work to your own model.
+  on your model; name it, so that the choice is deliberate.
+- Never hand work to `anthropic/claude-fable-5-2`. It costs the most.
+  It manages, or it is not used.
+- Pick the executor by the kind of work, whichever model you are. It
+  may be a stronger model than you: you decide, brief and check, and it
+  does the heavy part.
 - Opus: builds, and anything later work will stand on.
 - Sonnet: wide searches, reading many files, mechanical edits.
 - Haiku: simple lookups and bulk mechanical work. Check its output more
