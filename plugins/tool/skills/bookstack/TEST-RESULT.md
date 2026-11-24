@@ -32,6 +32,7 @@
 
 ### Changed after the test
 
+- After a bug report from a second machine (2026-11-23): the script has its own place for settings, `~/.config/agent-plugins/bookstack.env`, read before the older one, and a settings line may use the names `BOOKSTACK_URL`, `BOOKSTACK_TOKEN_ID` and `BOOKSTACK_TOKEN_SECRET`. Covered by unit tests, 43 in all now. Not tried on a machine without the older file.
 - On 2026-11-23 the plugin `tool` was installed in Claude Code for the user and the loose skill, with its PowerShell script, was parked outside the folder Claude Code loads skills from. From then on docs are mirrored with the Python script.
 
 ### Limits

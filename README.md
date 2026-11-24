@@ -75,11 +75,15 @@ in those two apps.
 What the tool skills need:
 
 - `plane`: `PLANE_BASE_URL`, `PLANE_WORKSPACE_SLUG` and `PLANE_API_KEY`
-  in the environment, or the same three in a JSON file named by
-  `PLANE_CONFIG_FILE`.
+  in the environment, or as three `NAME=value` lines in
+  `~/.config/agent-plugins/plane.env`.
 - `bookstack`: `BOOKSTACK_URL`, `BOOKSTACK_TOKEN_ID` and
-  `BOOKSTACK_TOKEN_SECRET` in the environment, or a file named by
-  `BOOKSTACK_ENV_FILE`.
+  `BOOKSTACK_TOKEN_SECRET` in the environment, or as three lines in
+  `~/.config/agent-plugins/bookstack.env`.
+
+Each script names the file to create when it finds no settings.
+`PLANE_CONFIG_FILE` and `BOOKSTACK_ENV_FILE` point at a file somewhere
+else.
 
 Both scripts use the Python standard library only. Neither prints a
 key.

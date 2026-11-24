@@ -36,7 +36,7 @@ Use the first one that is there.
 - For longer text, write it to a file and pass `--description-file` or `--file`.
 - `create` and `comment` are not safe to repeat blindly: if one fails after Plane may have acted, look at the ticket first.
 
-The script finds Plane's address, the workspace and the key in the environment variables `PLANE_BASE_URL`, `PLANE_WORKSPACE_SLUG` and `PLANE_API_KEY`, or in the `plane` entry of the OpenCode config in the user's home folder. It never prints the key. Keep the key out of your own output too.
+The script finds Plane's address, the workspace and the key in the environment variables `PLANE_BASE_URL`, `PLANE_WORKSPACE_SLUG` and `PLANE_API_KEY`, or in the file `~/.config/agent-plugins/plane.env`, which holds the same three as `NAME=value` lines. An older place is still read after those: the `plane` entry of the OpenCode config in the home folder. When nothing is found, the script says which file to create. It never prints the key. Keep the key out of your own output too.
 
 ## What is particular here
 

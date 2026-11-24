@@ -7,9 +7,10 @@ The sync script and any direct call take the address and the token from the same
 
 1. The environment variables `BOOKSTACK_URL`, `BOOKSTACK_TOKEN_ID` and `BOOKSTACK_TOKEN_SECRET`.
 2. A file named by `BOOKSTACK_ENV_FILE`.
-3. `~/.config/opencode/playbooks/install-bookstack/.env`, where the user's installation keeps them.
+3. `~/.config/agent-plugins/bookstack.env`.
+4. An older place, still read when the file above is not there: `~/.config/opencode/playbooks/install-bookstack/.env`.
 
-In a file the names are `APP_URL`, `API_TOKEN_ID` and `API_TOKEN_SECRET`, one `NAME=value` per line. Read only the needed values and keep them out of logs and reports.
+A file holds three lines, `BOOKSTACK_URL=...`, `BOOKSTACK_TOKEN_ID=...` and `BOOKSTACK_TOKEN_SECRET=...`. The older names `APP_URL`, `API_TOKEN_ID` and `API_TOKEN_SECRET` are read too. When nothing is found, the script says which file to create. Read only the needed values and keep them out of logs and reports.
 
 Pages accept raw `markdown` on create/update. BookStack trims trailing newlines, so compare content with trailing whitespace removed.
 

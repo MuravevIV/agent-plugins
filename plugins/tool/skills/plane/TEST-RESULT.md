@@ -24,6 +24,7 @@
 ### Changed after the test
 
 - The last paragraph was narrowed on the user's word: the note about `protocol:trail` is for a request to implement a ticket only, a plain change such as marking a ticket done is just done, and the skill says outright that only the user loads a protocol. Not run again.
+- After a bug report from a second machine (2026-11-23): the script has its own place for settings, `~/.config/agent-plugins/plane.env`, read before the OpenCode config, and a file may hold plain `NAME=value` lines. Covered by unit tests, 40 in all now. Not tried on a machine without the older file.
 - On 2026-11-23 the plugin `tool` was installed in Claude Code for the user and the loose skill was parked outside the folder Claude Code loads skills from.
 
 ### Limits

@@ -6,10 +6,12 @@ to standard error with exit code 1; wrong usage exits with code 2.
 
 Settings, first found wins for each value:
   1. the environment variables PLANE_BASE_URL, PLANE_WORKSPACE_SLUG, PLANE_API_KEY
-  2. the JSON file named by PLANE_CONFIG_FILE
-  3. ~/.config/opencode/opencode.json
-In a file, the values are taken from the dict that holds PLANE_API_KEY, wherever it is nested. Comments and
-trailing commas in the file are allowed. The API key is never printed.
+  2. the file named by PLANE_CONFIG_FILE
+  3. ~/.config/agent-plugins/plane.env
+  4. ~/.config/opencode/opencode.json (an older place, still read)
+A file holds either three lines of the form NAME=value, or JSON; in JSON the values are taken from the dict
+that holds PLANE_API_KEY, wherever it is nested, and comments and trailing commas are allowed. The API key is
+never printed.
 
 When Plane answers 429 (too many calls per minute), the tool waits PLANE_RETRY_WAIT seconds (default 20) and tries
 again, up to PLANE_RETRY_COUNT times (default 8).
@@ -143,6 +145,9 @@ def read_config_file(path: Path) -> Dict[str, str]:
                       "The tool takes Plane's address, workspace and API key from it.",
                       "Check that the file exists and can be read, or set PLANE_BASE_URL, PLANE_WORKSPACE_SLUG and "
                       "PLANE_API_KEY in the environment.")
+    lines = env_lines(text)
+    if lines:  # a file of NAME=value lines
+        return lines
     try:
         found = find_settings_dict(json.loads(strip_json_comments(text))) or {}
     except ValueError:  # still not valid JSON: pick the values out by name
@@ -159,7 +164,24 @@ def read_config_file(path: Path) -> Dict[str, str]:
     return values
 
 
+def env_lines(text: str) -> Dict[str, str]:
+    """The settings found as NAME=value lines, one per line. Quotes around a value are dropped."""
+    values: Dict[str, str] = {}
+    for line in text.splitlines():
+        name, eq, value = line.strip().partition("=")
+        name, value = name.strip(), value.strip().strip("\"'").strip()
+        if eq and name in NAMES and value and name not in values:
+            values[name] = value
+    return values
+
+
+def own_settings_path() -> Path:
+    """The settings file of this tool: three NAME=value lines."""
+    return Path.home() / ".config" / "agent-plugins" / "plane.env"
+
+
 def default_config_path() -> Path:
+    """An older place, still read: the OpenCode config, where a Plane MCP entry holds the same values."""
     return Path.home() / ".config" / "opencode" / "opencode.json"
 
 
@@ -172,12 +194,13 @@ def load_settings() -> Settings:
         if not path.is_file():
             raise Problem(f"PLANE_CONFIG_FILE names {path}, and that file does not exist.",
                           "The tool cannot reach Plane without its address, workspace and API key.",
-                          "Point PLANE_CONFIG_FILE at an existing JSON file, or unset it.")
+                          "Point PLANE_CONFIG_FILE at an existing file, or unset it.")
         looked_at.append(str(path))
         for name, value in read_config_file(path).items():
             values.setdefault(name, value)
-    if len(values) < len(NAMES):
-        path = default_config_path()
+    for path in (own_settings_path(), default_config_path()):
+        if len(values) == len(NAMES):
+            break
         if path.is_file():
             looked_at.append(str(path))
             for name, value in read_config_file(path).items():
@@ -188,8 +211,9 @@ def load_settings() -> Settings:
     if missing:
         raise Problem(f"No value for {', '.join(missing)}. Looked in: {'; '.join(looked_at)}.",
                       "The tool cannot reach Plane without its address, workspace and API key.",
-                      "Set the missing environment variables, or set PLANE_CONFIG_FILE to a JSON file whose dict "
-                      "with PLANE_API_KEY also holds PLANE_BASE_URL and PLANE_WORKSPACE_SLUG.")
+                      f"Create the file {own_settings_path()} with the three lines PLANE_BASE_URL=..., "
+                      "PLANE_WORKSPACE_SLUG=... and PLANE_API_KEY=..., or set those three as environment "
+                      "variables, or point PLANE_CONFIG_FILE at a file that holds them.")
     if not re.match(r"^https?://", values["PLANE_BASE_URL"]):
         raise Problem(f"PLANE_BASE_URL is {values['PLANE_BASE_URL']!r}, which does not start with http:// or "
                       "https://.", "The tool cannot build Plane's addresses from it.",
@@ -623,7 +647,8 @@ def build_parser() -> argparse.ArgumentParser:
         prog="plane.py", description="Read and change tickets in a self-hosted Plane through its REST API. "
         "Output is JSON. PROJECT is a project identifier such as PDX; KEY is a ticket key such as PDX-12.",
         epilog="Settings: PLANE_BASE_URL, PLANE_WORKSPACE_SLUG, PLANE_API_KEY from the environment, else from the "
-        "JSON file in PLANE_CONFIG_FILE, else from ~/.config/opencode/opencode.json. Waiting after 'too many calls': "
+        "file in PLANE_CONFIG_FILE, else from ~/.config/agent-plugins/plane.env (three NAME=value lines), else "
+        "from ~/.config/opencode/opencode.json. Waiting after 'too many calls': "
         "PLANE_RETRY_WAIT seconds (default 20), PLANE_RETRY_COUNT times (default 8).")
     sub = parser.add_subparsers(dest="command", metavar="COMMAND")
     sub.required = True

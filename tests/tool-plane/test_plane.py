@@ -389,6 +389,8 @@ class FailureTests(PlaneTestCase):
         err = self.fails("projects")
         self.assertIn("No value for PLANE_BASE_URL, PLANE_API_KEY", err)
         self.assertIn(self.home.name, err)  # it looked in the (temporary) home folder, not the real one
+        self.assertIn("plane.env", err)  # and it names the file to create
+        self.assertIn("with the three lines", err)
         self.assertIn("What to do next", err)
 
     def test_missing_config_file_named(self) -> None:
@@ -448,6 +450,32 @@ class SettingsFileTests(PlaneTestCase):
     def test_default_config_file_in_home(self) -> None:
         self.clear_env()
         self.write_config(Path(self.home.name) / ".config" / "opencode" / "opencode.json", self.base)
+        self.assertEqual(len(self.ok("projects")), 2)
+
+    def test_own_settings_file_in_home(self) -> None:
+        self.clear_env()
+        own = Path(self.home.name) / ".config" / "agent-plugins" / "plane.env"
+        own.parent.mkdir(parents=True)
+        own.write_text(f"# my Plane\nPLANE_BASE_URL={self.base}\nPLANE_WORKSPACE_SLUG = '{SLUG}'\n"
+                       f"PLANE_API_KEY=\"{KEY}\"\n", encoding="utf-8")
+        self.assertEqual(len(self.ok("projects")), 2)
+
+    def test_own_settings_file_wins_over_the_older_place(self) -> None:
+        self.clear_env()
+        self.write_config(Path(self.home.name) / ".config" / "opencode" / "opencode.json",
+                          "http://127.0.0.1:9")  # nothing listens there
+        own = Path(self.home.name) / ".config" / "agent-plugins" / "plane.env"
+        own.parent.mkdir(parents=True)
+        own.write_text(f"PLANE_BASE_URL={self.base}\nPLANE_WORKSPACE_SLUG={SLUG}\nPLANE_API_KEY={KEY}\n",
+                       encoding="utf-8")
+        self.assertEqual(len(self.ok("projects")), 2)
+
+    def test_file_of_lines_named_by_env(self) -> None:
+        self.clear_env()
+        path = Path(self.home.name) / "elsewhere.env"
+        path.write_text(f"PLANE_BASE_URL={self.base}\nPLANE_WORKSPACE_SLUG={SLUG}\nPLANE_API_KEY={KEY}\n",
+                        encoding="utf-8")
+        os.environ["PLANE_CONFIG_FILE"] = str(path)
         self.assertEqual(len(self.ok("projects")), 2)
 
     def test_environment_wins_over_file(self) -> None:

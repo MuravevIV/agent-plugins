@@ -33,7 +33,10 @@ from typing import Any, Dict, List, Mapping, NoReturn, Optional, Sequence, Set, 
 
 DEFAULT_BOOK_NAME = "Notes"
 STATE_FILE_NAME = ".wiki-sync.json"
-DEFAULT_ENV_FILE = "~/.config/opencode/playbooks/install-bookstack/.env"
+# Where the settings file is looked for when BOOKSTACK_ENV_FILE is not set: this tool's own place first, then
+# an older place that is still read.
+OWN_ENV_FILE = "~/.config/agent-plugins/bookstack.env"
+OLDER_ENV_FILE = "~/.config/opencode/playbooks/install-bookstack/.env"
 # (environment variable, name in the settings file)
 SETTING_NAMES: Tuple[Tuple[str, str], ...] = (
     ("BOOKSTACK_URL", "APP_URL"),
@@ -88,7 +91,9 @@ def load_settings(environ: Mapping[str, str]) -> Settings:
     if all(values):
         return Settings(values[0].rstrip("/"), values[1], values[2])
 
-    env_file = environ.get("BOOKSTACK_ENV_FILE") or os.path.expanduser(DEFAULT_ENV_FILE)
+    own, older = os.path.expanduser(OWN_ENV_FILE), os.path.expanduser(OLDER_ENV_FILE)
+    env_file = environ.get("BOOKSTACK_ENV_FILE") or (older if os.path.isfile(older) and not os.path.isfile(own)
+                                                      else own)
     env_vars = ", ".join(var for var, _ in SETTING_NAMES)
     if not os.path.isfile(env_file):
         raise SyncError(
@@ -96,8 +101,9 @@ def load_settings(environ: Mapping[str, str]) -> Settings:
             f"and the settings file {env_file} does not exist",
             "without the wiki's address and an API token the script cannot read or change the wiki, "
             "so nothing was synced",
-            "set the three environment variables, or set BOOKSTACK_ENV_FILE to a file with the lines "
-            "APP_URL=..., API_TOKEN_ID=... and API_TOKEN_SECRET=..., then run the script again",
+            f"create the file {own} with the three lines BOOKSTACK_URL=..., BOOKSTACK_TOKEN_ID=... and "
+            "BOOKSTACK_TOKEN_SECRET=..., or set those three as environment variables, or point "
+            "BOOKSTACK_ENV_FILE at a file that holds them, then run the script again",
         )
     try:
         with open(env_file, encoding="utf-8-sig") as handle:
@@ -111,9 +117,10 @@ def load_settings(environ: Mapping[str, str]) -> Settings:
 
     found: Dict[str, str] = {}
     for line in lines:
-        for _, name in SETTING_NAMES:
-            if name not in found and line.startswith(name + "="):
-                found[name] = line[len(name) + 1:]
+        key, equals, value = line.strip().partition("=")
+        for var, name in SETTING_NAMES:  # a line may use either name: BOOKSTACK_URL=... or APP_URL=...
+            if equals and key.strip() in (var, name) and name not in found:
+                found[name] = value.strip().strip("\"'").strip()
     missing = [name for _, name in SETTING_NAMES if not found.get(name)]
     if missing:
         raise SyncError(
@@ -658,7 +665,9 @@ def parse_args(argv: Optional[Sequence[str]]) -> argparse.Namespace:
         "Run it from the project root; docs/.wiki-sync.json names the shelf and records the page ids.",
         epilog="Settings: the environment variables BOOKSTACK_URL, BOOKSTACK_TOKEN_ID and "
         "BOOKSTACK_TOKEN_SECRET; if they are not all set, the file named by BOOKSTACK_ENV_FILE, "
-        f"or else {DEFAULT_ENV_FILE}, with the lines APP_URL=..., API_TOKEN_ID=... and API_TOKEN_SECRET=...",
+        f"or else {OWN_ENV_FILE}, or else {OLDER_ENV_FILE}. A file holds three lines, BOOKSTACK_URL=..., "
+        "BOOKSTACK_TOKEN_ID=... and BOOKSTACK_TOKEN_SECRET=... (the older names APP_URL, API_TOKEN_ID and "
+        "API_TOKEN_SECRET are read too).",
     )
     parser.add_argument(
         "--dry-run",

@@ -575,10 +575,34 @@ class SettingsTests(SyncTestCase):
         self.sync_ok(BOOKSTACK_TOKEN_SECRET=None)
         self.assertEqual(len(self.wiki.pages), 2)
 
+    def _own_file(self, text: str) -> None:
+        folder = os.path.join(self.home, ".config", "agent-plugins")
+        os.makedirs(folder)
+        with open(os.path.join(folder, "bookstack.env"), "w", encoding="utf-8") as handle:
+            handle.write(text)
+
+    def test_settings_from_own_file_in_home(self) -> None:
+        self.basic_project()
+        self._own_file(f"# my wiki\nBOOKSTACK_URL={self.wiki.url}\nBOOKSTACK_TOKEN_ID = '{TOKEN_ID}'\n"
+                       f"BOOKSTACK_TOKEN_SECRET=\"{TOKEN_SECRET}\"\n")
+        self.sync_ok(BOOKSTACK_TOKEN_SECRET=None)
+        self.assertEqual(len(self.wiki.pages), 2)
+
+    def test_own_file_wins_over_the_older_place(self) -> None:
+        self.basic_project()
+        folder = os.path.join(self.home, ".config", "opencode", "playbooks", "install-bookstack")
+        os.makedirs(folder)
+        with open(os.path.join(folder, ".env"), "w", encoding="utf-8") as handle:
+            handle.write(f"APP_URL=http://127.0.0.1:9\nAPI_TOKEN_ID={TOKEN_ID}\nAPI_TOKEN_SECRET={TOKEN_SECRET}\n")
+        self._own_file(self._env_file_text())
+        self.sync_ok(BOOKSTACK_URL=None)
+        self.assertEqual(len(self.wiki.pages), 2)
+
     def test_settings_missing(self) -> None:
         self.basic_project()
         result = self.run_sync(BOOKSTACK_URL=None, BOOKSTACK_TOKEN_ID=None, BOOKSTACK_TOKEN_SECRET=None)
-        self.assert_failure(result, "settings are missing", "BOOKSTACK_URL", "BOOKSTACK_ENV_FILE")
+        self.assert_failure(result, "settings are missing", "BOOKSTACK_URL", "BOOKSTACK_ENV_FILE",
+                            "bookstack.env", "with the three lines")
         self.assertEqual(self.wiki.requests, [])
 
     def test_settings_file_without_a_value(self) -> None:
