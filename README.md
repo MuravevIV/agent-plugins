@@ -85,8 +85,7 @@ Both scripts use the Python standard library only. Neither prints a
 key.
 
 Python versions: everything is written for 3.9 or later and developed
-on 3.12 on Windows. Known limits on older versions: Anthropic's review
-page generator in `make-skill` needs 3.10, and
+on 3.12 on Windows. One known limit on older versions:
 `pack_skill.py enable` needs 3.11 for the Codex file, and says so.
 
 ## make-skill
@@ -94,8 +93,9 @@ page generator in `make-skill` needs 3.10, and
 Anthropic's `skill-creator` (Apache 2.0) with the author's rules added.
 
 - Anthropic's files are kept as they are, apart from two spots in
-  `SKILL.md`: the name and description at the top, and a note under the
-  title that points to the house rules.
+  `SKILL.md` (the name and description at the top, and a note under the
+  title that points to the house rules) and one added line at the top
+  of four scripts, which lets Python 3.9 load them.
 - The additions are in `plugins/core/skills/make-skill/house/`. Start
   with `house/rules.md`.
 - `house/CHANGES.md` lists every change to Anthropic's files and every
@@ -108,7 +108,8 @@ Anthropic's `skill-creator` (Apache 2.0) with the author's rules added.
 
 To take a new version from Anthropic, replace their files with the ones
 from `github.com/anthropics/skills`, folder `skills/skill-creator`, and
-put the two spots in `SKILL.md` back. The copy here matched their commit
+put back what `house/CHANGES.md` lists: the two spots in `SKILL.md` and
+the one line in four scripts. The copy here matched their commit
 `e4bb5d9` of 2026-11-16.
 
 ## Tests

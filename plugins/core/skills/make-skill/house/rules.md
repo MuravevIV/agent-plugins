@@ -2,8 +2,9 @@
 
 Read this before following `SKILL.md`. Where the two differ, this file
 wins. `SKILL.md` and the folders `agents/`, `scripts/`, `eval-viewer/`,
-`assets/` and `references/` are Anthropic's and are kept unchanged so that
-new versions can be merged in. Everything of ours is in this `house/`
+`assets/` and `references/` are Anthropic's and are kept as they came, apart
+from the few changes listed in `house/CHANGES.md`, so that new versions can
+be merged in. Everything of ours is in this `house/`
 folder.
 
 A word on terms: Anthropic's text says "eval" for a test of a skill and

@@ -22,6 +22,7 @@ content was on 2026-03-06.
 | `SKILL.md` | `name` changed from `skill-creator` to `make-skill`; `description` extended to cover making a skill from a finished session and checking whether a skill helps at all | 2026-11-22 |
 | `SKILL.md` | A note added right under the title, pointing to `house/rules.md`, `house/from-session.md` and this file | 2026-11-22 |
 | `SKILL.md` | `description` extended by two sentences saying it covers protocol skills too. Reason: the second protocol skill, `trail`, was written without this skill being loaded | 2026-11-22 |
+| `eval-viewer/generate_review.py`, `scripts/improve_description.py`, `scripts/run_eval.py`, `scripts/run_loop.py` | One line added before the first import: `from __future__ import annotations`. Reason: these files write type hints as `dict \| None`, which Python 3.9 cannot read when it loads the file; 3.9 is the Python that comes with macOS. The line makes Python keep the hints as text. Nothing else in the files is changed | 2026-11-23 |
 
 No other Anthropic file is changed.
 

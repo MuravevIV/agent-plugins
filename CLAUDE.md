@@ -13,10 +13,10 @@ Rules for working here:
 - **Other people's work stays out** unless its licence file and
   copyright line come with it and its changes are listed.
 - **Anthropic's files in `plugins/core/skills/make-skill/` stay as they
-  are.** Additions go in its `house/` folder. `SKILL.md` may differ from
-  Anthropic's in two spots only (name and description; the note under
-  the title). Any other change to an Anthropic file needs the user's word
-  and a line in `house/CHANGES.md`.
+  are.** Additions go in its `house/` folder. They differ from
+  Anthropic's only where `house/CHANGES.md` says so: two spots in
+  `SKILL.md` and one added line in four scripts. Any other change to an
+  Anthropic file needs the user's word and a line in that file.
 - **Before writing, splitting, renaming or changing any skill, load
   `make-skill`** and follow `house/rules.md`. That covers protocol
   skills too.

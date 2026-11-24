@@ -6,6 +6,8 @@ and returning the best description found. Supports train/test split to prevent
 overfitting.
 """
 
+from __future__ import annotations  # added, see house/CHANGES.md: lets Python 3.9 read the type hints
+
 import argparse
 import json
 import random

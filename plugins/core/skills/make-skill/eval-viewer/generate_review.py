@@ -12,6 +12,8 @@ Usage:
 No dependencies beyond the Python stdlib are required.
 """
 
+from __future__ import annotations  # added, see house/CHANGES.md: lets Python 3.9 read the type hints
+
 import argparse
 import base64
 import json

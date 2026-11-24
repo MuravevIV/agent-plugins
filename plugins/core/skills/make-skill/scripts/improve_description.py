@@ -6,6 +6,8 @@ by calling `claude -p` as a subprocess (same auth pattern as run_eval.py —
 uses the session's Claude Code auth, no separate ANTHROPIC_API_KEY needed).
 """
 
+from __future__ import annotations  # added, see house/CHANGES.md: lets Python 3.9 read the type hints
+
 import argparse
 import json
 import os
