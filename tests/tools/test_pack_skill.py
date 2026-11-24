@@ -6,9 +6,15 @@ Run with:
 Each test builds a tiny repository (two marketplace files, one plugin, one skill) in a temporary folder and
 calls the script's main() with --repo pointing there. The real repository is never touched.
 """
-import contextlib, importlib.util, io, json, sys, tempfile, tomllib, unittest
+import contextlib, importlib.util, io, json, sys, tempfile, unittest
 from datetime import date
 from pathlib import Path
+
+try:
+    import tomllib  # part of Python from 3.11 on
+except ImportError:
+    tomllib = None
+NEEDS_TOMLLIB = unittest.skipIf(tomllib is None, "writing a Codex config file needs Python 3.11 or later")
 
 sys.dont_write_bytecode = True
 SCRIPT = Path(__file__).resolve().parents[2] / "tools" / "pack_skill.py"
@@ -183,6 +189,25 @@ class PackSkillTest(unittest.TestCase):
         code, out = self.run_main("check")
         self.assertNotEqual(code, 0, out)
         self.assertIn('lists a plugin "ghost" that has no folder', out)
+
+    def test_older_python_without_tomllib_still_files_and_says_so_for_codex(self):
+        kept = pack.tomllib
+        pack.tomllib = None  # as on Python 3.9 and 3.10
+        try:
+            src = self.make_skill(decision="keep")
+            code, out = self.run_main("add", str(src), "--plugin", "core")
+            self.assertEqual(code, 0, out)
+            code, out = self.run_main("add", str(src), "--plugin", "core", "--replace")
+            self.assertEqual(code, 0, out)
+            project = self.root / "old-python-project"
+            project.mkdir()
+            code, out = self.run_main("enable", "core", "--project", str(project))
+            self.assertIn("needs Python 3.11 or later", out)
+            self.assertIn("switch the plugin on by hand", out)
+            self.assertFalse((project / ".codex" / "config.toml").exists())
+            self.assertTrue((project / ".claude" / "settings.json").is_file(), "the other apps are still done")
+        finally:
+            pack.tomllib = kept
 
     def test_add_points_out_paths_and_the_home_project_in_the_text(self):
         src = self.root / "home-proj" / ".claude" / "skills" / "new-skill"
@@ -381,6 +406,7 @@ class PackSkillTest(unittest.TestCase):
         return (project / ".claude" / "settings.json", project / ".github" / "copilot" / "settings.json",
                 project / ".codex" / "config.toml")
 
+    @NEEDS_TOMLLIB
     def test_enable_writes_three_files_keeps_keys_and_repeats_cleanly(self):
         project = self.root / "project"
         claude, copilot, codex = self.project_files(project)
@@ -405,6 +431,7 @@ class PackSkillTest(unittest.TestCase):
         self.assertEqual(code, 0, out)
         self.assertEqual(snapshot(project), before)
 
+    @NEEDS_TOMLLIB
     def test_enable_leaves_broken_json_alone(self):
         project = self.root / "project"
         claude, copilot, codex = self.project_files(project)
@@ -415,6 +442,7 @@ class PackSkillTest(unittest.TestCase):
         self.assertIn("left unchanged", out)
         self.assertTrue(claude.is_file() and codex.is_file())
 
+    @NEEDS_TOMLLIB
     def test_enable_leaves_codex_switched_off_alone(self):
         project = self.root / "project"
         codex = self.project_files(project)[2]

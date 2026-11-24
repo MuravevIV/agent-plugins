@@ -329,7 +329,12 @@ def instruction_file_above(workspace):
 
 
 def users_own_instruction_file():
-    return Path.home() / ".claude" / "CLAUDE.md"
+    """The user's own instruction file, with links in its path followed.
+
+    The workspace it is compared with is resolved too. Without this, a home folder reached through a link
+    (on macOS the temporary folder /var is a link to /private/var) was not recognised, and runs started
+    with the user's personal instructions in scope."""
+    return (Path.home() / ".claude" / "CLAUDE.md").resolve()
 
 
 def pick_iteration(workspace, given):
@@ -548,7 +553,7 @@ def prepare(a):
     ctx.workspace = (Path(a.workspace) if a.workspace else
                      ctx.skill_dir.parent / f"{ctx.skill_name}-workspace").resolve()
     above = instruction_file_above(ctx.workspace)
-    if above and above == users_own_instruction_file() and not a.keep_user_setup:
+    if above and above.resolve() == users_own_instruction_file() and not a.keep_user_setup:
         home = Path.home()
         raise Stop(f"I can't start the runs with the workspace {ctx.workspace}. It is inside your home folder "
                    f"{home}, and Claude Code reads your own instruction file {above} for every project under that "

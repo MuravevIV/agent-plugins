@@ -25,11 +25,11 @@ On names: the skill is `triad` in the plugin `protocol`, so the user types `/pro
   - The section "Review before a commit" was added late on 2026-11-22 on the user's word and is not tested, by the user's choice: when another loaded protocol has a judgement step before a commit (`trail` has one), the outside model reviews every change that alters behaviour. The cost is asked once per session. The figure "5 to 15 cents" per review is a guess from the one grading job run so far.
   - The section "With other protocols", the two lines that keep shared records with the manager and let an executor write up research, and the last sentence of "When the task ends" were added late on 2026-11-22 on the user's word, when the second protocol `trail` was made. None of it is tested, and no session has run with two protocols loaded yet.
   - Found on 2026-11-22, after all runs: every run of this skill's tests, on every side, also read the user's own global instruction file, because the workspaces lay inside the home folder. That file is about something else (use of the PC's graphics card), no answer mentions it, and all sides saw the same, so the comparisons hold. The side "without the skill" was still not a bare model. The runner refuses such a workspace now.
-- **Where the full version went:** `..\triad-full\` holds it whole (`SKILL.md`, four reference files, `scripts/outside_grader.py`). Its self-tests in `..\tests\` still pass. Case 7 is kept out of `evals/evals.json` on purpose, because its request carries a yes for sending, so running all cases would send material out unasked; it is defined in `..\triad-workspace\single-file-test\build_single_test.py`.
+- **Where the full version went:** the author keeps it whole outside this repository (`SKILL.md`, four reference files, `scripts/outside_grader.py`, and its self-tests). Case 7 is kept out of `evals/evals.json` on purpose, because its request carries a yes for sending, so running all cases would send material out unasked; its definition is with the author's run records.
 
 ## 2026-11-22, first test: the whole skill, found by its description
 
-The files this block names (`references/`, `scripts/outside_grader.py`) now live in `..\triad-full\`.
+The files this block names (`references/`, `scripts/outside_grader.py`) belong to that full version and are not in this repository.
 
 - **Decision:** shrink. The rules that matter most work better as seven lines in the project's instruction file than as a skill. Keep a smaller skill for the grading work only. The change itself is not made yet; it waits on the user's word.
 - **What was tested:** the whole skill as drafted on 2026-11-22 (`SKILL.md`, four reference files, `scripts/outside_grader.py`), against no skill, and against no skill plus the seven lines in `evals/instruction-lines.md` written into the project's `CLAUDE.md`.
@@ -106,13 +106,13 @@ Two short trial runs on the Haiku model first showed that a prompt starting with
 
 Cost: two runs, $1.19 list price, 97 seconds together. The trial runs cost under one cent.
 
-Records: `..\triad-workspace\retest-by-name\`.
+Records: kept by the author outside this repository.
 
 Not known: how Copilot and Codex treat the same settings (taken from their documentation, not run); whether the judged expectations hold when graded by the outside grader.
 
 ## Test of the one-file version (2026-11-22)
 
-The one-file version is now `SKILL.md` in this folder (it was `..\triad-single\SKILL.md` when tested): the same protocol in a single file of about 1,000 words, with no reference files and no grading script. The grading call through OpenCode is written out in the file and made by hand.
+The one-file version is now `SKILL.md` in this folder (it had a folder of its own when tested): the same protocol in a single file of about 1,000 words, with no reference files and no grading script. The grading call through OpenCode is written out in the file and made by hand.
 
 What was run: four runs on `claude-fable-5-2`, skill loaded by name, one run per case, only the side with the skill. Cases 2, 4 and 5 are the ones from the first test. Case 7 is new: the request already holds the user's yes for sending, so the run has to make the OpenCode call itself. The user said yes to sending case 7's five made-up files to the outside grader.
 
@@ -131,6 +131,6 @@ What the hand-made call lacks next to the grading script: no saved record of wha
 
 Cost: four runs, $1.98 list price, about 3 minutes together. The grader's one call was not measured (a few cents).
 
-Records: `..\triad-workspace\single-file-test\`. The agent file and the message that was sent are in `eval-7-grading-sent-by-hand-after-a-yes\grading-call\`. Case 7 is defined in `build_single_test.py` there.
+Records: kept by the author outside this repository, with the agent file and the message that was sent for case 7, and the script that defines that case.
 
 Not known: whether the one-file version holds on cases 1, 3 and 6 (not run); anything beyond one run per case; how it does against the full skill side by side, since both were only looked at on their own.

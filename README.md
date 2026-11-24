@@ -1,8 +1,13 @@
 # agent-plugins
 
-One person's plugins for coding agents: Claude Code first, with
-description files that GitHub Copilot and OpenAI Codex also accept. The
-repository is its own plugin marketplace, named `agent-plugins`.
+One person's plugins for coding agents, made for and used in Claude
+Code. The repository is its own plugin marketplace, named
+`agent-plugins`.
+
+GitHub Copilot and OpenAI Codex: the plugin description files follow
+their published formats, and that is all. No skill here has been run in
+either app, and the test runner in `make-skill` drives Claude Code's
+command line only.
 
 These are working tools, published as they are. The protocols and tool
 skills assume the author's setup: a self-hosted Plane tracker, a
@@ -76,8 +81,13 @@ What the tool skills need:
   `BOOKSTACK_TOKEN_SECRET` in the environment, or a file named by
   `BOOKSTACK_ENV_FILE`.
 
-Both scripts are Python 3.9 or later with the standard library only.
-Neither prints a key.
+Both scripts use the Python standard library only. Neither prints a
+key.
+
+Python versions: everything is written for 3.9 or later and developed
+on 3.12 on Windows. Known limits on older versions: Anthropic's review
+page generator in `make-skill` needs 3.10, and
+`pack_skill.py enable` needs 3.11 for the Codex file, and says so.
 
 ## make-skill
 

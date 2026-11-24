@@ -15,9 +15,14 @@ starts no other program and uses no network.
 Exit codes: 0 done, 1 problems found or left, 2 the command could not be carried out as given,
 3 nothing was changed because a choice by the person is needed.
 """
-import argparse, copy, json, os, re, shutil, stat, sys, tempfile, tomllib
+import argparse, copy, json, os, re, shutil, stat, sys, tempfile
 from datetime import date
 from pathlib import Path
+
+try:
+    import tomllib  # part of Python from 3.11 on
+except ImportError:  # 3.9 and 3.10: everything works except reading a Codex config file
+    tomllib = None
 
 SCRIPT = Path(__file__).resolve()
 DEFAULT_REPO = SCRIPT.parents[1]
@@ -381,7 +386,8 @@ def copy_skill(src, target):
     try:
         shutil.copytree(src, tmp / target.name, ignore=skip_junk)
         if target.exists():
-            shutil.rmtree(target, onexc=make_writable)
+            # The handler's name changed in Python 3.12; both forms call it with three arguments.
+            shutil.rmtree(target, **{"onexc" if sys.version_info >= (3, 12) else "onerror": make_writable})
         os.replace(tmp / target.name, target)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -530,6 +536,11 @@ def enable_json(path, key, market=None, repo=None):
 
 
 def enable_codex(path, key):
+    if tomllib is None:
+        return False, [f"Nothing was written to {path}. Reading a Codex config file needs Python 3.11 or "
+                       f"later, and this is Python {sys.version_info.major}.{sys.version_info.minor}. Run the "
+                       "same command with a newer Python, or switch the plugin on by hand: in that file, "
+                       f"{codex_line('', key)}"]
     text = ""
     if path.is_file():
         with open(path, encoding="utf-8-sig", newline="") as f:  # keep the file's own line ends

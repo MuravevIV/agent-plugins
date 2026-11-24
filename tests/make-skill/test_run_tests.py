@@ -175,7 +175,7 @@ class RunTestsTest(unittest.TestCase):
     def test_workspace_under_the_users_own_instruction_file_is_not_started(self):
         # the made-up home folder is the one that holds the workspace, and it has the user's own instruction file
         (self.tmp / ".claude").mkdir()
-        (self.tmp / ".claude" / "CLAUDE.md").write_text("Always ask the GPU lock first.\n", encoding="utf-8")
+        (self.tmp / ".claude" / "CLAUDE.md").write_text("Always answer in French.\n", encoding="utf-8")
         home = dict(USERPROFILE=str(self.tmp), HOME=str(self.tmp))
         p = self.run_runner("--cases", "1", **home)
         self.assertEqual(p.returncode, 2, p.all)
@@ -187,6 +187,29 @@ class RunTestsTest(unittest.TestCase):
         p = self.run_runner("--cases", "1", "--keep-user-setup", **home)
         self.assertEqual(p.returncode, 0, p.all)
         self.assertIn("sits under a folder with its own instruction file", p.all)
+
+    def test_home_folder_reached_through_a_link_is_still_recognised(self):
+        # the home folder is given as a link; the workspace lies in it and resolves to the real folder
+        real = self.tmp / "real-home"
+        (real / ".claude").mkdir(parents=True)
+        (real / ".claude" / "CLAUDE.md").write_text("Always answer in French.\n", encoding="utf-8")
+        link = self.tmp / "home-link"
+        try:
+            os.symlink(real, link, target_is_directory=True)
+        except (OSError, NotImplementedError) as e:
+            # Windows asks for a special right to make a symbolic link; a junction needs none.
+            made = os.name == "nt" and subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(real)],
+                                                      capture_output=True).returncode == 0
+            if not made:
+                self.skipTest(f"this system does not let the test make a link to a folder: {e}")
+        self.assertNotEqual(str(link.resolve()), str(link), "the link has to lead somewhere else")
+        proc = subprocess.run([sys.executable, str(RUNNER), "--skill", str(self.skill), "--program", str(FAKE),
+                               "--workspace", str(link / "ws"), "--cases", "1"],
+                              env=self.env(USERPROFILE=str(link), HOME=str(link)),
+                              capture_output=True, text=True, encoding="utf-8", timeout=180)
+        self.assertEqual(proc.returncode, 2, proc.stdout + proc.stderr)
+        self.assertIn("inside your home folder", proc.stdout + proc.stderr)
+        self.assertEqual(self.starts(), 0)
 
     def test_timeout_fails_plainly_and_is_done_again(self):
         p = self.run_runner("--cases", "1", "--timeout", "2", FAKE_CLAUDE_MODE="hang")
