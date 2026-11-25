@@ -196,6 +196,12 @@ Codex and GitHub Copilot.
 - Ask the user before the first install into Copilot or Codex. It changes
   their setup for a moment.
 
+A skill in a plugin lives outside the user's project. Reading its other
+files (`references/`, `house/`) can need a permission, and a session that
+runs without the user at hand gets no prompt for it. Seen on 2026-11-24
+with Claude Code. So whatever a skill needs when it runs unattended goes
+into `SKILL.md`; other files are for what a person is there to approve.
+
 To keep a skill usable in all three, write its text without leaning on
 one app: say "ask the user" instead of naming one app's question tool,
 and "the project's skills folder" with `.claude/skills/` as an example.
