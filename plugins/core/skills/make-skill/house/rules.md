@@ -267,6 +267,13 @@ typing its name. No app should open it on its own.
 - Only the user loads a protocol. No other skill loads one by name or
   tells the model to. A skill may say that a protocol exists and what
   it is for, and may tell the user that it is not loaded.
+- A protocol the user loaded stays loaded when the session is
+  summarised. Its section "When the conversation is summarised" keeps
+  one line in the summary with the path of its own file, and tells the
+  model to read that file again when the text is gone and to say so in
+  one line. That is not loading a protocol: the user already picked
+  it. The user is asked to type the name again only when the file
+  cannot be read.
 - A protocol that writes to a system outside the session (a tracker, a
   wiki) names that system and says it writes nowhere else. Words such
   as "the tracker" are not enough: where a second tracker is in reach,

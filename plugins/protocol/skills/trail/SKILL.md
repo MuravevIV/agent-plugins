@@ -212,13 +212,18 @@ A long session gets summarised to free space, and this text can be lost
 with it. The protocol still applies.
 
 - If you write the summary, put this in it, on a line of its own, next
-  to the line of every other loaded protocol:
+  to the line of every other loaded protocol. In place of `<path>` put
+  the full path of this file as you saw it when the protocol was loaded
+  (the skill's base directory plus `SKILL.md`):
 
   ```
-  protocol:trail is active. If its text is not in view, ask the user to type its name again.
+  protocol:trail is active. Its text is the file <path>. If the text is not in view, read that file again and tell the user in one line that you did.
   ```
 
 - After a summary, check that you can still see this whole text, down to
-  the section "With other protocols". If you cannot, tell the user in
-  one line that the protocol text did not survive the summary, and ask
-  them to type the skill's name again.
+  the section "With other protocols". If you cannot, read this file
+  again before any other work, and tell the user in one line that you
+  did. The user picked this protocol for the session already, so
+  reading its text again is not loading a protocol on your own.
+- Ask the user to type the skill's name again only when the file cannot
+  be found or read. Say that in one line, and do not go on from memory.
